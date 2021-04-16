@@ -171,17 +171,16 @@ def handle_button(message):
             q_string += key[0]+' OR '
         if q_string:
             top_headlines = newsapi.get_top_headlines(q=q_string)
-            print(q_string)
             if len(top_headlines['articles']) != 0:
                 for top_new in top_headlines['articles'][:10]:
                     new_text = top_new['title']+'\n'+top_new['description']
                     bot.send_photo(message.from_user.id,
-                                top_new['urlToImage'], caption=new_text)
+                                   top_new['urlToImage'], caption=new_text)
             else:
                 bot.send_message(
-                message.from_user.id,
-                'На данный момент нет новых новостей',
-            )
+                    message.from_user.id,
+                    'На данный момент нет новых новостей',
+                )
         else:
             bot.send_message(
                 message.from_user.id,
@@ -189,25 +188,32 @@ def handle_button(message):
             )
 
     elif message.text == 'Новости по подпискам':
-        tag_list = sql('select_all', 'get_user_subscribes',
+        tag_list = sql('select_all', 'get_user_subscribe_id',
                        (message.from_user.id,))
         sources_string = ''
         for tag in tag_list:
             sources_string += tag[0]+','
         if sources_string:
             top_headlines = newsapi.get_top_headlines(sources=sources_string)
+            print(sources_string)
             print(top_headlines)
             if len(top_headlines['articles']) != 0:
                 for top_new in top_headlines['articles'][:10]:
                     new_text = top_new['title']+'\n'+top_new['description']
-                    bot.send_photo(message.from_user.id,
-                                top_new['urlToImage'], caption=new_text)
+                    if top_new['urlToImage']:
+                        bot.send_photo(message.from_user.id,
+                                       top_new['urlToImage'], caption=new_text)
+                    else:
+                        bot.send_message(
+                            message.from_user.id,
+                            new_text,
+                        )
             else:
                 bot.send_message(
-                message.from_user.id,
-                'На данный момент нет новых новостей',
-            )
-        
+                    message.from_user.id,
+                    'На данный момент нет новых новостей',
+                )
+
         else:
             bot.send_message(
                 message.from_user.id,

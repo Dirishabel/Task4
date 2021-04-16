@@ -40,5 +40,7 @@ QUERIES={
         WHERE UserID={0}
         AND subscribe_name = '{1}'
     """,
-    
+    'get_user_subscribe_id': """
+        SELECT subscribe_id FROM Subscribes WHERE UserID = {0}
+    """,
 }
