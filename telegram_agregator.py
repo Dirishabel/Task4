@@ -164,24 +164,55 @@ def handle_button(message):
         )
 
     elif message.text == 'Новости по ключевым словам':
-        key_list = sql('select_all' ,'get_user_keywords', (message.from_user.id,))
+        key_list = sql('select_all', 'get_user_keywords',
+                       (message.from_user.id,))
         q_string = ''
         for key in key_list:
             q_string += key[0]+' OR '
-        top_headlines = newsapi.get_top_headlines(q=q_string)
-        for top_new in top_headlines['articles'][:5]:
-            new_text = top_new['title']+'\n'+top_new['description']
-            bot.send_photo(message.from_user.id, top_new['urlToImage'], caption=new_text)
-            
+        if q_string:
+            top_headlines = newsapi.get_top_headlines(q=q_string)
+            print(q_string)
+            if len(top_headlines['articles']) != 0:
+                for top_new in top_headlines['articles'][:10]:
+                    new_text = top_new['title']+'\n'+top_new['description']
+                    bot.send_photo(message.from_user.id,
+                                top_new['urlToImage'], caption=new_text)
+            else:
+                bot.send_message(
+                message.from_user.id,
+                'На данный момент нет новых новостей',
+            )
+        else:
+            bot.send_message(
+                message.from_user.id,
+                'На данный момент у вас еще нет ключевых слов',
+            )
+
     elif message.text == 'Новости по подпискам':
-        tag_list = sql('select_all', 'get_user_subscribes', (message.from_user.id,))
+        tag_list = sql('select_all', 'get_user_subscribes',
+                       (message.from_user.id,))
         sources_string = ''
         for tag in tag_list:
             sources_string += tag[0]+','
-        top_headlines = newsapi.get_top_headlines(sources=sources_string)
-        for top_new in top_headlines['articles'][:5]:
-            new_text = top_new['title']+'\n'+top_new['description']
-            bot.send_photo(message.from_user.id, top_new['urlToImage'], caption=new_text)
+        if sources_string:
+            top_headlines = newsapi.get_top_headlines(sources=sources_string)
+            print(top_headlines)
+            if len(top_headlines['articles']) != 0:
+                for top_new in top_headlines['articles'][:10]:
+                    new_text = top_new['title']+'\n'+top_new['description']
+                    bot.send_photo(message.from_user.id,
+                                top_new['urlToImage'], caption=new_text)
+            else:
+                bot.send_message(
+                message.from_user.id,
+                'На данный момент нет новых новостей',
+            )
+        
+        else:
+            bot.send_message(
+                message.from_user.id,
+                'На данный момент у вас еще нет подписок',
+            )
     else:
         bot.send_message(message.from_user.id, MESSAGES['err_msg'])
 
