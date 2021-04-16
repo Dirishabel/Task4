@@ -174,8 +174,14 @@ def handle_button(message):
             if len(top_headlines['articles']) != 0:
                 for top_new in top_headlines['articles'][:10]:
                     new_text = top_new['title']+'\n'+top_new['description']
-                    bot.send_photo(message.from_user.id,
-                                   top_new['urlToImage'], caption=new_text)
+                    if top_new['urlToImage']:
+                        bot.send_photo(message.from_user.id,
+                                       top_new['urlToImage'], caption=new_text)
+                    else:
+                        bot.send_message(
+                            message.from_user.id,
+                            new_text,
+                        )
             else:
                 bot.send_message(
                     message.from_user.id,
@@ -195,8 +201,6 @@ def handle_button(message):
             sources_string += tag[0]+','
         if sources_string:
             top_headlines = newsapi.get_top_headlines(sources=sources_string)
-            print(sources_string)
-            print(top_headlines)
             if len(top_headlines['articles']) != 0:
                 for top_new in top_headlines['articles'][:10]:
                     new_text = top_new['title']+'\n'+top_new['description']
